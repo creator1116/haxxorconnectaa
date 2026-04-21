@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HaxxorConnect — Plans & Pricing</title>
+<link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:wght@400;600;700&family=Orbitron:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:       #080b10;
+    --surface:  #0d1117;
+    --border:   #1e2d3d;
+    --accent:   #00e5ff;
+    --accent2:  #7fff00;
+    --accent3:  #ff4f70;
+    --muted:    #4a6075;
+    --text:     #c9d8e8;
+    --mono:     'Cascadia Code', 'Cascadia Mono', monospace;
+    --sans:     'Orbitron', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Grid background ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Glow blobs ── */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+    opacity: .18;
+  }
+  .blob-1 { width: 500px; height: 500px; background: var(--accent);  top: -150px; left: -150px; }
+  .blob-2 { width: 400px; height: 400px; background: #7f00ff;         bottom: -100px; right: -100px; }
+
+  /* ── Layout ── */
+  .page { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 0 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 72px;
+  }
+  .logo {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    color: var(--accent);
+    letter-spacing: .05em;
+  }
+  .logo span { color: var(--muted); }
+  .badge {
+    font-family: var(--mono);
+    font-size: .72rem;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 4px 10px;
+    letter-spacing: .08em;
+    animation: blink 2.4s step-end infinite;
+  }
+  .badge.online  { color: var(--accent2); border-color: var(--accent2); }
+  .badge.offline { color: var(--accent3); border-color: var(--accent3); animation: none; }
+  .badge.checking { color: var(--muted);  border-color: var(--muted); }
+
+  /* ── Hero ── */
+  .hero { text-align: center; margin-bottom: 72px; }
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: .78rem;
+    color: var(--accent);
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp .6s .1s forwards;
+  }
+  .hero h1 {
+    font-family: var(--sans);
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp .6s .2s forwards;
+  }
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(90deg, #a855f7, #00e5ff, #a855f7);
+    background-size: 200%;
+    background-position: center;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 580px;
+    margin: 0 auto;
+    line-height: 1.7;
+    opacity: 0;
+    animation: fadeUp .6s .3s forwards;
+  }
+  .hero-cycling {
+    display: inline;
+  }
+  .hero-static {
+    color: var(--text);
+  }
+  .cycle-word {
+    color: var(--accent);
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity .4s, transform .4s;
+    min-width: 2px;
+  }
+  .cycle-word.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Cards ── */
+  .plans {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 24px;
+    align-items: start;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 36px 32px 32px;
+    position: relative;
+    transition: border-color .25s, transform .25s;
+    opacity: 0;
+    animation: fadeUp .6s forwards;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-4px); }
+  .card:nth-child(1) { animation-delay: .35s; }
+  .card:nth-child(2) { animation-delay: .45s; }
+  .card:nth-child(3) { animation-delay: .55s; }
+
+  .card:nth-child(1) { border-left: 3px solid #94a3b8; }
+  .card:nth-child(2) { border-left: 3px solid var(--accent); }
+  .card:nth-child(3) { border-left: 3px solid var(--accent2); }
+  .card.featured {
+    border-color: var(--accent);
+    background: linear-gradient(160deg, #0d1b28 0%, var(--surface) 100%);
+  }
+  .card.featured::before {
+    content: 'MOST POPULAR';
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: var(--bg);
+    font-family: var(--mono);
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    padding: 4px 14px;
+  }
+  .card.featured .glow-line {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  /* Tier tag */
+  .tier-tag {
+    font-family: var(--mono);
+    font-size: .72rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: inline-block;
+  }
+  .card:nth-child(1) .tier-tag { color: #94a3b8; }
+  .card:nth-child(2) .tier-tag { color: var(--accent); }
+  .card:nth-child(3) .tier-tag { color: var(--accent2); }
+
+  .card:nth-child(1) .card-name { color: #94a3b8; }
+  .card:nth-child(2) .card-name { color: var(--accent); }
+  .card:nth-child(3) .card-name { color: var(--accent2); }
+
+  .card-name {
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .card-desc {
+    font-size: .85rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 28px;
+    min-height: 3.2em;
+  }
+
+  .price {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 28px;
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+  }
+  .price-amount {
+    font-family: var(--mono);
+    font-size: 2.6rem;
+    color: #fff;
+    font-weight: 700;
+  }
+  .price-currency {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    color: var(--muted);
+    align-self: flex-start;
+    margin-top: 8px;
+  }
+  .price-period {
+    font-family: var(--mono);
+    font-size: .78rem;
+    color: var(--muted);
+  }
+  .price-contact {
+    font-family: var(--mono);
+    font-size: 1.35rem;
+    color: var(--accent2);
+    padding: 18px 0;
+  }
+
+  /* Feature list */
+  .features {
+    list-style: none;
+    margin-bottom: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+  .features li {
+    font-size: .88rem;
+    font-family: var(--mono);
+    color: var(--text);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+  .features li .icon {
+    flex-shrink: 0;
+    width: 16px;
+    margin-top: 1px;
+  }
+  .features li.dim { color: var(--muted); }
+  .ok   { color: var(--accent); }
+  .star { color: var(--accent2); }
+  .x    { color: var(--accent3); }
+
+  /* Divider within list */
+  .features .section-label {
+    font-size: .65rem;
+    letter-spacing: .14em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    display: block;
+  }
+
+  /* CTA button */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    font-family: var(--mono);
+    font-size: .88rem;
+    letter-spacing: .08em;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    transition: background .2s, color .2s;
+    text-decoration: none;
+  }
+  .btn:hover { background: var(--accent); color: var(--bg); }
+  .btn.featured-btn { background: var(--accent); color: var(--bg); }
+  .btn.featured-btn:hover { background: transparent; color: var(--accent); }
+  .btn.unlimited-btn { border-color: var(--accent2); color: var(--accent2); }
+  .btn.unlimited-btn:hover { background: var(--accent2); color: var(--bg); }
+
+  /* ── Comparison table ── */
+  .compare-section { margin-top: 88px; }
+  .section-title {
+    font-family: var(--mono);
+    font-size: .72rem;
+    color: var(--accent);
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .section-heading {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 40px;
+  }
+
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: .84rem;
+  }
+  thead th {
+    padding: 12px 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-weight: 400;
+    letter-spacing: .08em;
+  }
+  thead th:first-child { text-align: left; }
+  thead th.col-popular { color: var(--accent); }
+
+  tbody tr { border-bottom: 1px solid rgba(30,45,61,.5); }
+  tbody tr:hover td { background: rgba(0,229,255,.03); }
+  tbody td {
+    padding: 14px 20px;
+    color: var(--text);
+    text-align: center;
+    vertical-align: middle;
+  }
+  tbody td:first-child { text-align: left; color: var(--muted); }
+  tbody td .check { color: var(--accent); }
+  tbody td .check2 { color: var(--accent2); }
+  tbody td .cross  { color: var(--accent3); }
+  .group-label td {
+    padding-top: 22px;
+    padding-bottom: 6px;
+    font-size: .68rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── Footer ── */
+  footer {
+    margin-top: 80px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  footer .logo { font-size: .9rem; }
+  footer p { font-family: var(--mono); font-size: .72rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<div class="page">
+  <header>
+    <div class="logo">haxxor<span>//</span>connect</div>
+    <div class="badge" id="statusBadge">● CHECKING...</div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-tag">// Plans & Pricing</div>
+    <h1>Choose your <em>access tier</em></h1>
+    <p>
+      <span class="hero-static">Your perfect solution for </span><span class="cycle-word" id="cycler"></span>
+    </p>
+  </section>
+
+  <!-- Cards -->
+  <div class="plans">
+
+    <!-- Basic -->
+    <div class="card">
+      <div class="tier-tag">tier_01</div>
+      <div class="card-name">Basic</div>
+      <div class="card-desc">Essential access for individuals and small-scale operations.</div>
+      <div class="price">
+        <span class="price-currency">$</span>
+        <span class="price-amount">9</span>
+        <span class="price-period">/ month</span>
+      </div>
+      <ul class="features">
+        <span class="section-label">// Script limits (per day)</span>
+        <li><span class="icon ok">▸</span> Default scripts — 25 requests/day</li>
+        <li><span class="icon ok">▸</span> Boss — 10 requests/day</li>
+        <li><span class="icon ok">▸</span> BIM — 10 requests/day</li>
+        <li><span class="icon ok">▸</span> PE Loader — 3 requests/day</li>
+        <span class="section-label">// Account</span>
+        <li><span class="icon ok">▸</span> 1 registered machine</li>
+        <li><span class="icon ok">▸</span> 8-hour session tokens</li>
+        <li><span class="icon ok">▸</span> HWID binding</li>
+        <li class="dim"><span class="icon x">✕</span> Priority support</li>
+      </ul>
+      <a href="#" class="btn">Get Basic</a>
+    </div>
+
+    <!-- Premium (featured) -->
+    <div class="card featured">
+      <div class="glow-line"></div>
+      <div class="tier-tag">tier_02</div>
+      <div class="card-name">Premium</div>
+      <div class="card-desc">5× higher limits for power users and active deployments.</div>
+      <div class="price">
+        <span class="price-currency">$</span>
+        <span class="price-amount">20</span>
+        <span class="price-period">/ month</span>
+      </div>
+      <ul class="features">
+        <span class="section-label">// Script limits (per day)</span>
+        <li><span class="icon ok">▸</span> Default scripts — 100 requests/day</li>
+        <li><span class="icon ok">▸</span> Boss — 50 requests/day</li>
+        <li><span class="icon ok">▸</span> BIM — 50 requests/day</li>
+        <li><span class="icon ok">▸</span> PE Loader — 15 requests/day</li>
+        <span class="section-label">// Account</span>
+        <li><span class="icon ok">▸</span> Up to 3 registered machines</li>
+        <li><span class="icon ok">▸</span> 8-hour session tokens</li>
+        <li><span class="icon ok">▸</span> HWID binding</li>
+        <li><span class="icon ok">▸</span> Priority support</li>
+      </ul>
+      <a href="#" class="btn featured-btn">Get Premium</a>
+    </div>
+
+    <!-- Unlimited -->
+    <div class="card">
+      <div class="tier-tag">tier_03</div>
+      <div class="card-name">Unlimited</div>
+      <div class="card-desc">Zero restrictions. Full admin access. Built for teams and enterprise deployments.</div>
+      <div class="price-contact">Contact for pricing</div>
+      <ul class="features">
+        <span class="section-label">// Script limits (per day)</span>
+        <li><span class="icon star">★</span> All scripts — unlimited</li>
+        <li><span class="icon star">★</span> Boss — unlimited</li>
+        <li><span class="icon star">★</span> BIM — unlimited</li>
+        <li><span class="icon star">★</span> PE Loader — unlimited</li>
+        <span class="section-label">// Account</span>
+        <li><span class="icon star">★</span> Up to 3 registered machines</li>
+        <li><span class="icon star">★</span> 8-hour session tokens</li>
+        <li><span class="icon star">★</span> HWID binding</li>
+        <li><span class="icon star">★</span> Priority support</li>
+      </ul>
+      <a href="#" class="btn unlimited-btn">Contact Us</a>
+    </div>
+
+  </div>
+
+  <!-- Comparison table -->
+  <div class="compare-section">
+    <div class="section-title">// Full Comparison</div>
+    <div class="section-heading">Everything side-by-side</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Basic</th>
+            <th class="col-popular">Premium</th>
+            <th>Unlimited</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="group-label"><td colspan="4">// Daily Script Quotas</td></tr>
+          <tr><td>Default scripts</td><td>25 / day</td><td>100 / day</td><td>∞</td></tr>
+          <tr><td>Boss</td><td>10 / day</td><td>50 / day</td><td>∞</td></tr>
+          <tr><td>BIM (JS)</td><td>10 / day</td><td>50 / day</td><td>∞</td></tr>
+          <tr><td>PE Loader</td><td>3 / day</td><td>15 / day</td><td>∞</td></tr>
+
+          <tr class="group-label"><td colspan="4">// Session & Security</td></tr>
+          <tr><td>JWT token TTL</td><td>8 hours</td><td>8 hours</td><td>8 hours</td></tr>
+          <tr><td>Session timeout</td><td>5 min idle</td><td>5 min idle</td><td>5 min idle</td></tr>
+          <tr><td>HWID machine binding</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check2">✓</span></td></tr>
+          <tr><td>Max registered machines</td><td>1</td><td>3</td><td>3</td></tr>
+          <tr><td>Single active session</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check2">✓</span></td></tr>
+          <tr><td>Client integrity check</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check2">✓</span></td></tr>
+          <tr><td>Fernet-encrypted delivery</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check2">✓</span></td></tr>
+          <tr><td>HMAC script signatures</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check2">✓</span></td></tr>
+          <tr><td>Audit logging</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check2">✓</span></td></tr>
+
+          <tr class="group-label"><td colspan="4">// Account Features</td></tr>
+          <tr><td>Priority support</td><td><span class="cross">✕</span></td><td><span class="check">✓</span></td><td><span class="check2">✓</span></td></tr>
+          <tr><td>Time-limited license support</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check2">✓</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    <div class="logo">haxxor<span>//</span>connect</div>
+    <p>© 2026 HaxxorConnect. All rights reserved.</p>
+  </footer>
+</div>
+<script>
+  const SERVER = 'https://haxxorconnect.onrender.com';
+  const badge  = document.getElementById('statusBadge');
+
+  async function checkServer() {
+    badge.className = 'badge checking';
+    badge.textContent = '● CHECKING...';
+    try {
+      const res = await fetch(`${SERVER}/health`, { signal: AbortSignal.timeout(8000) });
+      if (res.ok) {
+        badge.className = 'badge online';
+        badge.textContent = '● SYSTEM ONLINE';
+      } else {
+        badge.className = 'badge offline';
+        badge.textContent = '● SYSTEM DEGRADED';
+      }
+    } catch {
+      badge.className = 'badge offline';
+      badge.textContent = '● SYSTEM OFFLINE';
+    }
+  }
+
+  checkServer();
+  setInterval(checkServer, 30000);
+</script>
+
+<script>
+  const phrases = [
+    "encrypted remote script execution.",
+    "HWID-bound machine authentication.",
+    "JWT-secured session management.",
+    "full audit logging & telemetry.",
+    "Fernet-encrypted script delivery.",
+    "HMAC-signed tamper detection.",
+    "tiered access control.",
+    "in-memory fileless execution.",
+  ];
+
+  const el = document.getElementById('cycler');
+  let index = 0;
+
+  function cycle() {
+    el.classList.remove('visible');
+    setTimeout(() => {
+      el.textContent = phrases[index];
+      el.classList.add('visible');
+      index = (index + 1) % phrases.length;
+    }, 400);
+  }
+
+  cycle();
+  setInterval(cycle, 2800);
+</script>
+</body>
+</html>
