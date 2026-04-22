@@ -220,7 +220,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:56
 <div class="blob blob-1"></div>
 <div class="blob blob-2"></div>
 
-<!-- NAV -->
 <nav id="navbar">
   <a href="#hero" class="nav-logo">haxxor<span>//</span>connect</a>
   <ul class="nav-links">
@@ -236,7 +235,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:56
   </div>
 </nav>
 
-<!-- HERO -->
 <section id="hero">
   <div class="hero-eyebrow">// Trusted by operators worldwide</div>
   <h1 class="hero-h1">
@@ -259,7 +257,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:56
   </div>
 </section>
 
-<!-- PROOF BAR -->
 <section id="proof">
   <div class="proof-grid">
     <div class="proof-item reveal">
@@ -285,7 +282,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:56
   </div>
 </section>
 
-<!-- BENEFITS -->
 <section id="benefits">
   <div class="section-inner">
     <div class="eyebrow">// Why HaxxorConnect</div>
@@ -326,7 +322,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:56
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
 <section id="how">
   <div class="section-inner">
     <div class="eyebrow">// How It Works</div>
@@ -357,7 +352,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:56
   </div>
 </section>
 
-<!-- TOOLS -->
 <section id="tools">
   <div class="section-inner">
     <div class="eyebrow">// Your Toolkit</div>
@@ -464,7 +458,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:56
   </div>
 </section>
 
-<!-- TESTIMONIALS -->
 <section id="love">
   <div class="section-inner">
     <div class="eyebrow">// What People Say</div>
@@ -504,7 +497,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:56
   </div>
 </section>
 
-<!-- PRICING -->
 <section id="pricing">
   <div class="section-inner">
     <div class="eyebrow">// Plans & Pricing</div>
@@ -577,7 +569,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:56
   </div>
 </section>
 
-<!-- FAQ -->
 <section id="faq">
   <div class="section-inner">
     <div class="eyebrow">// FAQ</div>
@@ -611,7 +602,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:56
   </div>
 </section>
 
-<!-- CTA -->
 <section id="cta">
   <div class="section-inner">
     <div class="eyebrow" style="text-align:center">// Get Started Today</div>
@@ -624,7 +614,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:56
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
   <div class="footer-inner">
     <div>
@@ -696,18 +685,34 @@ const SERVER = 'https://haxxorconnect.onrender.com';
 async function checkStatus() {
   const nav  = document.getElementById('navStatus');
   const foot = document.getElementById('footerStatus');
+  
   try {
-    const r = await fetch(`${SERVER}/health`, { signal: AbortSignal.timeout(8000) });
+    // Add a 8-second timeout to the request
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 8000);
+    
+    const r = await fetch(`${SERVER}/health`, { signal: controller.signal });
+    clearTimeout(id);
+
     if (r.ok) {
-      nav.textContent = '● ONLINE';  nav.className = 'status-pill online';
-      foot.textContent = '● SERVER ONLINE'; foot.style.color = 'var(--accent2)';
+      // Server is reachable and returned 200 OK
+      nav.textContent = '● ONLINE';  
+      nav.className = 'status-pill online';
+      foot.textContent = '● SERVER ONLINE'; 
+      foot.style.color = 'var(--accent2)';
     } else {
-      nav.textContent = '● ONLINE';  nav.className = 'status-pill online';
-      foot.textContent = '● SERVER ONLINE'; foot.style.color = 'var(--accent2)';
+      // Server is reachable but returned an error (e.g., 500, 404)
+      nav.textContent = '● OFFLINE';  
+      nav.className = 'status-pill offline';
+      foot.textContent = '● SERVER ERROR'; 
+      foot.style.color = 'var(--accent3)';
     }
-  } catch {
-      nav.textContent = '● ONLINE';  nav.className = 'status-pill online';
-      foot.textContent = '● SERVER ONLINE'; foot.style.color = 'var(--accent2)';
+  } catch (error) {
+    // Connection timed out or network is down
+    nav.textContent = '● OFFLINE';  
+    nav.className = 'status-pill offline';
+    foot.textContent = '● SERVER OFFLINE'; 
+    foot.style.color = 'var(--accent3)';
   }
 }
 checkStatus();
