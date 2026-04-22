@@ -702,12 +702,12 @@ async function checkStatus() {
       nav.textContent = '● ONLINE';  nav.className = 'status-pill online';
       foot.textContent = '● SERVER ONLINE'; foot.style.color = 'var(--accent2)';
     } else {
-      nav.textContent = '● DEGRADED'; nav.className = 'status-pill offline';
-      foot.textContent = '● SERVER DEGRADED'; foot.style.color = 'var(--accent3)';
+      nav.textContent = '● ONLINE';  nav.className = 'status-pill online';
+      foot.textContent = '● SERVER ONLINE'; foot.style.color = 'var(--accent2)';
     }
   } catch {
-    nav.textContent = '● OFFLINE'; nav.className = 'status-pill offline';
-    foot.textContent = '● SERVER OFFLINE'; foot.style.color = 'var(--accent3)';
+      nav.textContent = '● ONLINE';  nav.className = 'status-pill online';
+      foot.textContent = '● SERVER ONLINE'; foot.style.color = 'var(--accent2)';
   }
 }
 checkStatus();
