@@ -680,35 +680,40 @@ window.addEventListener('scroll', () => {
   document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
 });
 
-// Server status
+// Server status (using keepalive.txt logic from Python client)
 const SERVER = 'https://haxxorconnect.onrender.com';
 async function checkStatus() {
   const nav  = document.getElementById('navStatus');
   const foot = document.getElementById('footerStatus');
   
+  // Use AbortController for broader browser compatibility
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
+
   try {
-    // Add a 8-second timeout to the request
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 8000);
+    // Fetch specifically for keepalive.txt as seen in haxxorconnect.py
+    const r = await fetch(`${SERVER}/keepalive.txt`, { 
+      signal: controller.signal,
+      cache: 'no-store'
+    });
     
-    const r = await fetch(`${SERVER}/health`, { signal: controller.signal });
-    clearTimeout(id);
+    clearTimeout(timeoutId);
 
     if (r.ok) {
-      // Server is reachable and returned 200 OK
+      // SUCCESS: keepalive file reached
       nav.textContent = '● ONLINE';  
       nav.className = 'status-pill online';
       foot.textContent = '● SERVER ONLINE'; 
       foot.style.color = 'var(--accent2)';
     } else {
-      // Server is reachable but returned an error (e.g., 500, 404)
+      // FAILURE: Server reachable but file missing (404/500)
       nav.textContent = '● OFFLINE';  
       nav.className = 'status-pill offline';
       foot.textContent = '● SERVER ERROR'; 
       foot.style.color = 'var(--accent3)';
     }
   } catch (error) {
-    // Connection timed out or network is down
+    // FAILURE: Network error or timeout
     nav.textContent = '● OFFLINE';  
     nav.className = 'status-pill offline';
     foot.textContent = '● SERVER OFFLINE'; 
