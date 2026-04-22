@@ -656,7 +656,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:56
 </footer>
 
 <script>
-// Custom cursor
+// Custom cursor logic
 const cursor = document.getElementById('cursor');
 const ring   = document.getElementById('cursorRing');
 let mx = 0, my = 0;
@@ -675,24 +675,26 @@ document.querySelectorAll('a,button').forEach(el => {
   el.addEventListener('mouseleave', () => cursor.style.transform = 'translate(-50%,-50%) scale(1)');
 });
 
-// Nav scroll
+// Nav scroll effect
 window.addEventListener('scroll', () => {
   document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
 });
 
-// Server status (using keepalive.txt logic from Python client)
+// SERVER STATUS LOGIC
 const SERVER = 'https://haxxorconnect.onrender.com';
+
 async function checkStatus() {
   const nav  = document.getElementById('navStatus');
   const foot = document.getElementById('footerStatus');
   
-  // Use AbortController for broader browser compatibility
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 8000);
 
   try {
-    // Fetch specifically for keepalive.txt as seen in haxxorconnect.py
+    // Target the keepalive.txt endpoint with explicit CORS mode
     const r = await fetch(`${SERVER}/keepalive.txt`, { 
+      method: 'GET',
+      mode: 'cors',
       signal: controller.signal,
       cache: 'no-store'
     });
@@ -700,27 +702,31 @@ async function checkStatus() {
     clearTimeout(timeoutId);
 
     if (r.ok) {
-      // SUCCESS: keepalive file reached
+      // SUCCESS: The server responded 200 OK for the keepalive file
       nav.textContent = '● ONLINE';  
       nav.className = 'status-pill online';
       foot.textContent = '● SERVER ONLINE'; 
       foot.style.color = 'var(--accent2)';
     } else {
-      // FAILURE: Server reachable but file missing (404/500)
+      // SERVER UP, FILE ERROR: Server is reachable but returned 404 or 500
       nav.textContent = '● OFFLINE';  
       nav.className = 'status-pill offline';
-      foot.textContent = '● SERVER ERROR'; 
+      foot.textContent = '● SERVER ERROR (Status: ' + r.status + ')'; 
       foot.style.color = 'var(--accent3)';
     }
   } catch (error) {
-    // FAILURE: Network error or timeout
+    // NETWORK DOWN: The request failed due to CORS issues, Timeout, or DNS failure
     nav.textContent = '● OFFLINE';  
     nav.className = 'status-pill offline';
-    foot.textContent = '● SERVER OFFLINE'; 
+    foot.textContent = '● CONNECTION FAILED'; 
     foot.style.color = 'var(--accent3)';
+    console.error("Status Check Error:", error);
   }
 }
+
+// Initial check on load
 checkStatus();
+// Re-check every 30 seconds to stay updated
 setInterval(checkStatus, 30000);
 
 // Hero cycling text
@@ -744,7 +750,7 @@ setInterval(() => {
   }, 350);
 }, 2800);
 
-// Scroll reveal
+// Scroll reveal logic
 const obs = new IntersectionObserver(entries => {
   entries.forEach((e, i) => {
     if (e.isIntersecting) {
@@ -755,7 +761,7 @@ const obs = new IntersectionObserver(entries => {
 }, { threshold: 0.1 });
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-// FAQ accordion
+// FAQ accordion logic
 document.querySelectorAll('.faq-q').forEach(btn => {
   btn.addEventListener('click', () => {
     const item = btn.parentElement;
